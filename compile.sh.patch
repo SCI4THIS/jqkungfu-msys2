@@ -1,0 +1,36 @@
+diff --git a/compile.sh b/compile.sh
+index 5800b42..f6f7702 100755
+--- a/compile.sh
++++ b/compile.sh
+@@ -20,14 +20,29 @@ git apply ../jq.patch
+ autoreconf -fi
+ 
+ # Run ./configure
+-emconfigure ./configure \
++emconfigure sh ./configure \
+     --with-oniguruma=builtin \
+     --disable-maintainer-mode
+ 
++for file in `find . -name Makefile -o -name libtool`
++do
++  echo "patching $file"
++  grep -v C: $file > $file.2
++  grep C: $file | sed 's/\\/\//g' | sed 's/C:/\/c/g' > $file.3
++  mv $file.3 $file
++  cat $file.2 >> $file
++  rm $file.2
++done
++
++pushd modules/oniguruma
++git apply ../../../../regerror.c.patch
++popd
++
+ # Compile jq and generate .js/.wasm files
+ emmake make \
+   EXEEXT=.js \
+-  CFLAGS="-O2 -s EXPORTED_RUNTIME_METHODS=['callMain']"
++  CFLAGS="-O2 -s EXPORTED_RUNTIME_METHODS=['callMain'] -D__IEEE_LITTLE_ENDIAN"
++
+ 
+ mkdir -p ../build/
+ mv jq.{js,wasm} ../build/

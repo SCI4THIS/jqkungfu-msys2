@@ -1,0 +1,16 @@
+diff --git a/src/regerror.c b/src/regerror.c
+index ee35b36..bf409eb 100644
+--- a/src/regerror.c
++++ b/src/regerror.c
+@@ -38,6 +38,11 @@
+ #define va_init_list(a,b) va_start(a)
+ #endif
+ 
++#define va_start(v,l) __builtin_va_start(v,l)
++#define va_end(v) __builtin_va_end(v)
++#define va_arg(v,l) __builtin_va_arg(v,l)
++#define va_copy(d,s) __builtin_va_copy(v,l)
++
+ extern UChar*
+ onig_error_code_to_format(int code)
+ {
